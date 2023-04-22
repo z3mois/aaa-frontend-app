@@ -6,7 +6,6 @@ from lib.image import image_to_img_src
 from lib.image import PolygonDrawer
 from lib.image import open_image
 
-
 class IndexView(View):
     async def get(self) -> Response:
         return render_template("index.html", self.request, {})
@@ -14,7 +13,12 @@ class IndexView(View):
     async def post(self) -> Response:
         try:
             form = await self.request.post()
+            file_type = form['image'].filename.split(".")[-1]
             image = open_image(form["image"].file)
+            if file_type == "png":
+                image = image.convert('RGB')
+                image.save('converted_image.jpg')
+                image = open_image('converted_image.jpg')
             draw = PolygonDrawer(image)
             model = self.request.app["model"]
             words = []
@@ -33,5 +37,5 @@ class IndexView(View):
             ctx = {"image": image_b64, "words": words}
             return render_template("index.html", self.request, ctx)
         except Exception as err:
-            ctx = {"error": str(err)}
+            ctx = {"error": repr(err)}
             return render_template("index.html", self.request, ctx)

@@ -14,6 +14,7 @@ async def test_index_page_contain_valid_multipart_form(client):
     assert form is not None
     assert form.attrs['method'].lower() == 'post'
     assert form.attrs['enctype'].lower() == 'multipart/form-data'
+    print(form.find('input'))
     submit = form.find('input', {'type': 'submit'})
     assert submit is not None
 
@@ -53,5 +54,5 @@ async def test_if_sent_faulty_image_then_error_appear_in_response(client):
     response = await client.post('/', data=form)
     text = (await response.text()).lower()
     assert response.status == HTTPStatus.OK, text
-    error = 'coordinate &#39;lower&#39; is less than &#39;upper&#39;'
+    error = '&#39;y1 must be greater than or equal to y0&#39;'
     assert error in text, text
